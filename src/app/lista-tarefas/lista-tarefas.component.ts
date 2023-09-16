@@ -33,6 +33,14 @@ export class ListaTarefasComponent {
   }
 
   excluirTarefa(index: number, lista: { descricao: string, concluida: boolean }[]) {
+    // Se a tarefa estiver nas listas de Pendentes ou A Fazer, remova-a do array de tarefas
+    if (lista === this.tarefasPendentes || lista === this.tarefasAFazer) {
+      const taskIndex = this.tarefas.findIndex(task => task === lista[index]);
+      if (taskIndex !== -1) {
+        this.tarefas.splice(taskIndex, 1);
+      }
+    }
+  
     lista.splice(index, 1);
     this.atualizarListas();
   }
