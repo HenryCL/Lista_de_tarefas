@@ -1,11 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-lista-tarefas',
   templateUrl: './lista-tarefas.component.html',
   styleUrls: ['./lista-tarefas.component.css']
 })
-export class ListaTarefasComponent {
+export class ListaTarefasComponent implements OnInit {
+
   tarefas: { tarefa: string, dataLimite: string, descricao: string, concluida: boolean }[] = [];
   tarefasPendentes: { tarefa: string, dataLimite: string, descricao: string, concluida: boolean }[] = [];
   tarefasConcluidas: { tarefa: string, dataLimite: string, descricao: string, concluida: boolean }[] = [];
@@ -13,6 +14,15 @@ export class ListaTarefasComponent {
   novaTarefa = '';
   novaDataLimite = '';
   novaDescricao = '';
+
+  ngOnInit() {
+    // Carregar as tarefas do localStorage quando o componente for inicializado
+    const tarefasFromStorage = localStorage.getItem('tarefas');
+    if (tarefasFromStorage) {
+      this.tarefas = JSON.parse(tarefasFromStorage);
+      this.atualizarListas();
+    }
+  }
 
   adicionarTarefa() {
     if (this.novaTarefa.trim() !== '' && this.novaDataLimite.trim() !== '' && this.novaDescricao.trim() !== '') {
@@ -26,37 +36,73 @@ export class ListaTarefasComponent {
       this.novaTarefa = '';
       this.novaDataLimite = '';
       this.novaDescricao = '';
+
+      // Atualizar o localStorage após adicionar uma tarefa
+      localStorage.setItem('tarefas', JSON.stringify(this.tarefas));
     }
   }
 
   editarTarefa(index: number, lista: { tarefa: string, dataLimite: string, descricao: string, concluida: boolean }[]) {
-    const novaDescricao = prompt('Editar tarefa:', lista[index].tarefa);
+    const novaTarefa = prompt('Editar tarefa:', lista[index].tarefa);
+    if (novaTarefa !== null) {
+      lista[index].tarefa = novaTarefa;
+      this.atualizarListas();
+      this.atualizarLocalStorage();
+    }
+
+    const novaDataLimite = prompt('Editar Data:', lista[index].dataLimite);
+    if (novaDataLimite !== null) {
+      lista[index].dataLimite = novaDataLimite;
+      this.atualizarLocalStorage();
+    }
+
+    const novaDescricao = prompt('Editar Descrição:', lista[index].descricao);
     if (novaDescricao !== null) {
-      lista[index].tarefa = novaDescricao;
+      lista[index].descricao = novaDescricao;
+      this.atualizarLocalStorage();
     }
   }
 
   alternarStatusTarefa(index: number, lista: { tarefa: string, dataLimite: string, descricao: string, concluida: boolean }[]) {
     lista[index].concluida = !lista[index].concluida;
     this.atualizarListas();
+    this.atualizarLocalStorage();
   }
 
   excluirTarefa(index: number, lista: { tarefa: string, dataLimite: string, descricao: string, concluida: boolean }[]) {
-    // Se a tarefa estiver nas listas de Pendentes ou A Fazer, seja removida (Ajuste)
-    if (lista === this.tarefasPendentes || lista === this.tarefasAFazer) {
+    if (lista === this.tarefasPendentes || lista === this.tarefasAFazer || lista === this.tarefasConcluidas) {
       const taskIndex = this.tarefas.findIndex(task => task === lista[index]);
       if (taskIndex !== -1) {
         this.tarefas.splice(taskIndex, 1);
+        this.atualizarLocalStorage();
       }
+
     }
-  
     lista.splice(index, 1);
     this.atualizarListas();
+    this.atualizarLocalStorage();
   }
 
   atualizarListas() {
     this.tarefasPendentes = this.tarefas.filter(tarefa => !tarefa.concluida);
     this.tarefasConcluidas = this.tarefas.filter(tarefa => tarefa.concluida);
-    this.tarefasAFazer = this.tarefas.filter(tarefa => !tarefa.concluida);
+    this.tarefasAFazer = this.tarefas.filter(tarefa => !tarefa.concluida && !this.tarefasPendentes.includes(tarefa));
   }
+  
+
+  atualizarLocalStorage() {
+    localStorage.setItem('tarefas', JSON.stringify(this.tarefas));
+  }
+moverParaFazendo(index: number) {
+  const tarefaSelecionada = this.tarefasPendentes[index];
+  if (tarefaSelecionada) {
+
+    this.tarefasPendentes.splice(index, 1);
+
+    this.tarefasAFazer.push(tarefaSelecionada);
+    this.atualizarLocalStorage();
+  }
+}
+
+
 }
