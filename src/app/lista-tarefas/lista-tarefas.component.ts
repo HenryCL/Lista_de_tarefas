@@ -70,12 +70,13 @@ export class ListaTarefasComponent implements OnInit {
   }
 
   excluirTarefa(index: number, lista: { tarefa: string, dataLimite: string, descricao: string, concluida: boolean }[]) {
-    if (lista === this.tarefasPendentes || lista === this.tarefasAFazer) {
+    if (lista === this.tarefasPendentes || lista === this.tarefasAFazer || lista === this.tarefasConcluidas) {
       const taskIndex = this.tarefas.findIndex(task => task === lista[index]);
       if (taskIndex !== -1) {
         this.tarefas.splice(taskIndex, 1);
         this.atualizarLocalStorage();
       }
+
     }
     lista.splice(index, 1);
     this.atualizarListas();
@@ -85,10 +86,23 @@ export class ListaTarefasComponent implements OnInit {
   atualizarListas() {
     this.tarefasPendentes = this.tarefas.filter(tarefa => !tarefa.concluida);
     this.tarefasConcluidas = this.tarefas.filter(tarefa => tarefa.concluida);
-    this.tarefasAFazer = this.tarefas.filter(tarefa => !tarefa.concluida);
+    this.tarefasAFazer = this.tarefas.filter(tarefa => !tarefa.concluida && !this.tarefasPendentes.includes(tarefa));
   }
+  
 
   atualizarLocalStorage() {
     localStorage.setItem('tarefas', JSON.stringify(this.tarefas));
   }
+moverParaFazendo(index: number) {
+  const tarefaSelecionada = this.tarefasPendentes[index];
+  if (tarefaSelecionada) {
+
+    this.tarefasPendentes.splice(index, 1);
+
+    this.tarefasAFazer.push(tarefaSelecionada);
+    this.atualizarLocalStorage();
+  }
+}
+
+
 }
