@@ -6,33 +6,42 @@ import { Component } from '@angular/core';
   styleUrls: ['./lista-tarefas.component.css']
 })
 export class ListaTarefasComponent {
-  tarefas: { descricao: string, concluida: boolean }[] = [];
-  tarefasPendentes: { descricao: string, concluida: boolean }[] = [];
-  tarefasConcluidas: { descricao: string, concluida: boolean }[] = [];
-  tarefasAFazer: { descricao: string, concluida: boolean }[] = [];
+  tarefas: { tarefa: string, dataLimite: string, descricao: string, concluida: boolean }[] = [];
+  tarefasPendentes: { tarefa: string, dataLimite: string, descricao: string, concluida: boolean }[] = [];
+  tarefasConcluidas: { tarefa: string, dataLimite: string, descricao: string, concluida: boolean }[] = [];
+  tarefasAFazer: { tarefa: string, dataLimite: string, descricao: string, concluida: boolean }[] = [];
   novaTarefa = '';
+  novaDataLimite = '';
+  novaDescricao = '';
 
   adicionarTarefa() {
-    if (this.novaTarefa.trim() !== '') {
-      this.tarefas.push({ descricao: this.novaTarefa, concluida: false });
+    if (this.novaTarefa.trim() !== '' && this.novaDataLimite.trim() !== '' && this.novaDescricao.trim() !== '') {
+      this.tarefas.push({
+        tarefa: this.novaTarefa,
+        dataLimite: this.novaDataLimite,
+        descricao: this.novaDescricao,
+        concluida: false
+      });
       this.atualizarListas();
       this.novaTarefa = '';
+      this.novaDataLimite = '';
+      this.novaDescricao = '';
     }
   }
 
-  editarTarefa(index: number, lista: { descricao: string, concluida: boolean }[]) {
-    const novaDescricao = prompt('Editar tarefa:', lista[index].descricao);
+  editarTarefa(index: number, lista: { tarefa: string, dataLimite: string, descricao: string, concluida: boolean }[]) {
+    const novaDescricao = prompt('Editar tarefa:', lista[index].tarefa);
     if (novaDescricao !== null) {
-      lista[index].descricao = novaDescricao;
+      lista[index].tarefa = novaDescricao;
     }
   }
 
-  alternarStatusTarefa(index: number, lista: { descricao: string, concluida: boolean }[]) {
+  alternarStatusTarefa(index: number, lista: { tarefa: string, dataLimite: string, descricao: string, concluida: boolean }[]) {
     lista[index].concluida = !lista[index].concluida;
     this.atualizarListas();
   }
 
-  excluirTarefa(index: number, lista: { descricao: string, concluida: boolean }[]) {
+  excluirTarefa(index: number, lista: { tarefa: string, dataLimite: string, descricao: string, concluida: boolean }[]) {
     // Se a tarefa estiver nas listas de Pendentes ou A Fazer, seja removida (Ajuste)
     if (lista === this.tarefasPendentes || lista === this.tarefasAFazer) {
       const taskIndex = this.tarefas.findIndex(task => task === lista[index]);
@@ -50,5 +59,4 @@ export class ListaTarefasComponent {
     this.tarefasConcluidas = this.tarefas.filter(tarefa => tarefa.concluida);
     this.tarefasAFazer = this.tarefas.filter(tarefa => !tarefa.concluida);
   }
-
-  }
+}
