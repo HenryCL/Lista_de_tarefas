@@ -22,21 +22,5 @@ Uma aplicação simples de gerenciamento de tarefas construída com Angular, HTM
 - JavaScript: Linguagem de programação usada para interatividade.
 - Bootstrap: Framework de front-end para criar interfaces de usuário responsivas e atraentes.
 
-## Como Usar
-
-1. Clone o repositório para o seu ambiente local:
-
-   ```bash
-   git clone https://github.com/seu-usuario/nome-do-repositorio.git
-
-    ```bash
-   cd nome-do-repositorio
-
-   ```bash
-   npm install
-
-  ```bash
-   ng serve
-
 
 
