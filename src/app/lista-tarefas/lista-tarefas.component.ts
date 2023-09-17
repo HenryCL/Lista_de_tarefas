@@ -1,22 +1,24 @@
 import { Component, OnInit } from '@angular/core';
+import { Tarefa } from '../tarefa.interface';
 
 @Component({
   selector: 'app-lista-tarefas',
   templateUrl: './lista-tarefas.component.html',
   styleUrls: ['./lista-tarefas.component.css']
 })
-export class ListaTarefasComponent implements OnInit {
 
-  tarefas: { tarefa: string, dataLimite: string, descricao: string, concluida: boolean }[] = [];
-  tarefasPendentes: { tarefa: string, dataLimite: string, descricao: string, concluida: boolean }[] = [];
-  tarefasConcluidas: { tarefa: string, dataLimite: string, descricao: string, concluida: boolean }[] = [];
-  tarefasAFazer: { tarefa: string, dataLimite: string, descricao: string, concluida: boolean }[] = [];
-  novaTarefa = '';
-  novaDataLimite = '';
-  novaDescricao = '';
+  export class ListaTarefasComponent implements OnInit {
+    tarefas: Tarefa[] = [];
+    tarefasPendentes: Tarefa[] = [];
+    tarefasConcluidas: Tarefa[] = [];
+    tarefasAFazer: Tarefa[] = [];
+    novaTarefa = '';
+    novaDataLimite = '';
+    novaDescricao = '';
+  
+    constructor() { }
 
   ngOnInit() {
-    // Carregar as tarefas do localStorage quando o componente for inicializado
     const tarefasFromStorage = localStorage.getItem('tarefas');
     if (tarefasFromStorage) {
       this.tarefas = JSON.parse(tarefasFromStorage);
@@ -37,7 +39,6 @@ export class ListaTarefasComponent implements OnInit {
       this.novaDataLimite = '';
       this.novaDescricao = '';
 
-      // Atualizar o localStorage após adicionar uma tarefa
       localStorage.setItem('tarefas', JSON.stringify(this.tarefas));
     }
   }
@@ -61,13 +62,7 @@ export class ListaTarefasComponent implements OnInit {
       lista[index].descricao = novaDescricao;
       this.atualizarLocalStorage();
     }
-  }
-
-  alternarStatusTarefa(index: number, lista: { tarefa: string, dataLimite: string, descricao: string, concluida: boolean }[]) {
-    lista[index].concluida = !lista[index].concluida;
-    this.atualizarListas();
-    this.atualizarLocalStorage();
-  }
+  } 
 
   excluirTarefa(index: number, lista: { tarefa: string, dataLimite: string, descricao: string, concluida: boolean }[]) {
     if (lista === this.tarefasPendentes || lista === this.tarefasAFazer || lista === this.tarefasConcluidas) {
@@ -78,9 +73,9 @@ export class ListaTarefasComponent implements OnInit {
       }
 
     }
-    lista.splice(index, 1);
-    this.atualizarListas();
-    this.atualizarLocalStorage();
+        lista.splice(index, 1);
+        this.atualizarListas();
+        this.atualizarLocalStorage();
   }
 
   atualizarListas() {
@@ -88,21 +83,26 @@ export class ListaTarefasComponent implements OnInit {
     this.tarefasConcluidas = this.tarefas.filter(tarefa => tarefa.concluida);
     this.tarefasAFazer = this.tarefas.filter(tarefa => !tarefa.concluida && !this.tarefasPendentes.includes(tarefa));
   }
-  
 
-  atualizarLocalStorage() {
-    localStorage.setItem('tarefas', JSON.stringify(this.tarefas));
-  }
-moverParaFazendo(index: number) {
-  const tarefaSelecionada = this.tarefasPendentes[index];
-  if (tarefaSelecionada) {
-
-    this.tarefasPendentes.splice(index, 1);
-
-    this.tarefasAFazer.push(tarefaSelecionada);
+  alternarStatusTarefa(index: number, lista: { tarefa: string, dataLimite: string, descricao: string, concluida: boolean }[]) {
+    lista[index].concluida = !lista[index].concluida;
+    this.atualizarListas();
     this.atualizarLocalStorage();
   }
+  
+  moverParaFazendo(index: number) {
+  const tarefaSelecionada = this.tarefasPendentes[index];
+    if (tarefaSelecionada) {
+
+      this.tarefasPendentes.splice(index, 1);
+
+      this.tarefasAFazer.push(tarefaSelecionada);
+      this.atualizarLocalStorage();
+    }
 }
 
+atualizarLocalStorage() {
+  localStorage.setItem('tarefas', JSON.stringify(this.tarefas));
+}
 
 }
